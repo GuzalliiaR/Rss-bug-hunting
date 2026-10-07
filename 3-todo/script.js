@@ -31,32 +31,31 @@ function toggleTask(id) {
 }
 
 function deleteTask(id) {
-  tasks.filter((t) => t.id !== id);
+  tasks = tasks.filter((t) => t.id !== id);
   render();
 }
 
 function clearCompleted() {
-  tasks = [];
+  tasks = tasks.filter((t) => t.done === false);
   render();
 }
 
 function getVisibleTasks() {
-  return tasks;
+  switch (currentFilter) {
+    case "active": return tasks.filter((t) => t.done === false);
+    case "done": return tasks.filter((t) => t.done === true);
+    default: return tasks;
+  }
 }
 
 function updateCounter() {
-  counter.textContent = "Активных задач: " + tasks.length;
+  const activeTasks = tasks.filter((t) => t.done === false);
+  counter.textContent = "Активных задач: " + activeTasks.length;
 }
 
 function render() {
   const visible = getVisibleTasks();
-  if (visible.length === 0) return;
-
   list.textContent = '';
-
-  console.log(visible);
-
-  
 
   for (let i = 0; i < visible.length; i++) {
     const task = visible[i];
@@ -79,11 +78,14 @@ function render() {
     li.appendChild(del);
     list.appendChild(li);
   }
+
   updateCounter();
 }
 
 addBtn.addEventListener("click", addTask);
 clearBtn.addEventListener("click", clearCompleted);
+input.addEventListener("input", () => { if (input.value.trim()) errorEl.hidden = true});
+input.addEventListener("keydown", (e) => { if (e.key === 'Enter') addTask() }) ;
 
 filterButtons.forEach((btn) => {
   btn.addEventListener("click", () => {
